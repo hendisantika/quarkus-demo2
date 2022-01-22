@@ -10,9 +10,11 @@ import org.slf4j.Logger;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Optional;
 
 /**
  * Created by IntelliJ IDEA.
@@ -49,4 +51,26 @@ public class CustomerResource {
     public Response get() {
         return Response.ok(customerService.findAll()).build();
     }
+
+    @GET
+    @Path("/{customerId}")
+    @APIResponses(
+            value = {
+                    @APIResponse(
+                            responseCode = "200",
+                            description = "Get Customer by customerId",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(type = SchemaType.OBJECT, implementation = Customer.class))),
+                    @APIResponse(
+                            responseCode = "404",
+                            description = "No Customer found for customerId provided",
+                            content = @Content(mediaType = "application/json")),
+            }
+    )
+    public Response getById(@PathParam("customerId") Integer customerId) {
+        Optional<Customer> optional = customerService.findById(customerId);
+        return !optional.isEmpty() ? Response.ok(optional.get()).build() :
+                Response.status(Response.Status.NOT_FOUND).build();
+    }
+
 }

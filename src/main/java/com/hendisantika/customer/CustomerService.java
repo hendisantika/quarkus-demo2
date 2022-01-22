@@ -3,6 +3,7 @@ package com.hendisantika.customer;
 import org.slf4j.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,5 +38,12 @@ public class CustomerService {
 
     public Optional<Customer> findById(Integer customerId) {
         return customerRepository.findByIdOptional(customerId).map(customerMapper::toDomain);
+    }
+
+    @Transactional
+    public Customer save(Customer customer) {
+        CustomerEntity entity = customerMapper.toEntity(customer);
+        customerRepository.persist(entity);
+        return customerMapper.toDomain(entity);
     }
 }
